@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def _tar_dep(dep):
     return dep + "//:tar"
@@ -25,7 +26,7 @@ def _join_list(l):
     return ",".join([_quote_string(i) for i in l])
 
 def web_repo(name, srcs, path, urls, sha256, strip_prefix, deps = [], licenses = ""):
-    native.new_http_archive(
+    http_archive(
         name = name,
         urls = urls,
         sha256 = sha256,

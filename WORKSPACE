@@ -1,24 +1,31 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 http_archive(
     name = "io_bazel_rules_closure",
-    sha256 = "b29a8bc2cb10513c864cb1084d6f38613ef14a143797cea0af0f91cd385f5e8c",
-    strip_prefix = "rules_closure-0.8.0",
+    sha256 = "7d206c2383811f378a5ef03f4aacbcf5f47fd8650f6abbc3fa89f3a27dd8b176",
+    strip_prefix = "rules_closure-0.10.0",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/0.8.0.tar.gz",
-        "https://github.com/bazelbuild/rules_closure/archive/0.8.0.tar.gz",
+        "https://github.com/bazelbuild/rules_closure/archive/0.10.0.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/0.10.0.tar.gz",
     ],
 )
 
-load("@io_bazel_rules_closure//closure:defs.bzl", "closure_repositories")
+load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
 
-closure_repositories()
+rules_closure_dependencies()
+
+rules_closure_toolchains()
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "90bb270d0a92ed5c83558b2797346917c46547f6f7103e648941ecdb6b9d0e72",
-    url = "https://github.com/bazelbuild/rules_go/releases/download/0.8.1/rules_go-0.8.1.tar.gz",
+    sha256 = "7b9bbe3ea1fccb46dcfa6c3f3e29ba7ec740d8733370e21cdc8937467b4a4349",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.22.4/rules_go-v0.22.4.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.22.4/rules_go-v0.22.4.tar.gz",
+    ],
 )
 
-load("@io_bazel_rules_go//go:def.bzl", "go_rules_dependencies", "go_register_toolchains")
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 
 go_rules_dependencies()
 
@@ -26,12 +33,11 @@ go_register_toolchains()
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "7550c6f7904f602b69c2a69d92f7c739db87479336554c7a31d0649519ec414e",
-    strip_prefix = "rules_nodejs-0.3.1",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.3.1.tar.gz"],
+    sha256 = "f9e7b9f42ae202cc2d2ce6d698ccb49a9f7f7ea572a78fd451696d03ef2ee116",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/1.6.0/rules_nodejs-1.6.0.tar.gz"],
 )
 
-new_http_archive(
+http_archive(
     name = "polymer_bundler_repo",
     build_file = "polymer-bundler.BUILD",
     sha256 = "906c8a2d5c47f7e43e580c120f6e636e7fb87ff82d065fa65ad8abdfafc3fc5d",
@@ -39,7 +45,7 @@ new_http_archive(
     urls = ["https://github.com/Polymer/polymer-bundler/archive/v1.16.0.tar.gz"],
 )
 
-new_http_archive(
+http_archive(
     name = "crisper_repo",
     build_file = "crisper.BUILD",
     sha256 = "c2865c3bc50e4efa2d4be944fb7df3d18cf8f3730ca9df3fe613c03761158cd2",
@@ -47,24 +53,26 @@ new_http_archive(
     urls = ["https://github.com/PolymerLabs/crisper/archive/v2.1.1.tar.gz"],
 )
 
-load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories", "npm_install")
+load("@build_bazel_rules_nodejs//:index.bzl", "node_repositories", "yarn_install")
 
 node_repositories(package_json = [
     "@polymer_bundler_repo//:package.json",
     "@crisper_repo//:package.json",
 ])
 
-npm_install(
+yarn_install(
     name = "vulcanize",
     package_json = "@polymer_bundler_repo//:package.json",
+    yarn_lock = "//:yarn.lock",
 )
 
-npm_install(
+yarn_install(
     name = "crisper",
     package_json = "@crisper_repo//:package.json",
+    yarn_lock = "//:yarn.lock",
 )
 
-new_http_archive(
+http_archive(
     name = "closure_compiler",
     build_file = "closure_compiler.BUILD",
     sha256 = "e7d5f24a9ba38b84294c8acc866a9d4ba0da03f297655d588d33d982cb6133f8",
@@ -209,7 +217,7 @@ web_repo(
     ],
 )
 
-new_http_archive(
+http_archive(
     name = "org_polymer_neon_animation",
     build_file_content = """
 package(default_visibility = ["//visibility:public"])
